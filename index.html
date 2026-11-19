@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Report TAG</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+</head>
+<body class="locked">
+<div id="lg"><div class="lgc"><h1>REPORT TAG</h1><p>Silakan login untuk membuka dashboard</p>
+<label for="lu">Username</label><input id="lu" autocomplete="username" autocapitalize="none">
+<label for="lp">Password</label><input id="lp" type="password" autocomplete="current-password">
+<div id="le"></div><button id="lb">Login</button></div></div>
+<aside>
+  <div class="logo">REPORT TAG<small>Sales Monitoring</small></div>
+  <div class="dpw"><label for="dp">Pilih tanggal</label><input type="date" id="dp"></div>
+  <div class="nav grp open" id="nvG" role="button" tabindex="0">Report</div>
+  <div class="sub" id="sub">
+    <div class="nav sb on" id="nvD" role="button" tabindex="0">Daily</div>
+    <div class="nav sb" id="nvP" role="button" tabindex="0">Progress</div>
+    <div class="nav sb" id="nvM" role="button" tabindex="0">MSCP</div>
+    <div class="nav sb" id="nvZ" role="button" tabindex="0">Zona Clinic</div>
+    <div class="nav sb" id="nvS" role="button" tabindex="0">Penjualan</div>
+    <div class="nav sb" id="nvR" role="button" tabindex="0">Rate</div>
+    </div>
+  <div class="nav" id="nvC" role="button" tabindex="0">Cetak Report</div>
+  <div class="nav" id="nvX" role="button" tabindex="0">Keluar</div>
+</aside>
+<main>
+<div id="pgDaily">
+  <header>
+    <div><h1 id="ttl">Semua Cabang</h1><div class="date" id="dt"></div></div>
+    
+  </header>
+  <div class="chips" id="chips" role="tablist" aria-label="Pilih cabang"></div>
+  <div class="note" id="note"></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="grid">
+    <div class="card"><h3 id="c1t">SPK vs Target</h3><div class="cv"><canvas id="c1"></canvas></div></div>
+    <div class="card"><h3 id="c2t">DO DMS vs Target</h3><div class="cv"><canvas id="c2"></canvas></div></div>
+    <div class="card"><h3>Komposisi Pembayaran (Leasing vs Cash)</h3><div class="cv"><canvas id="c3"></canvas></div></div>
+    <div class="card"><h3>Cash vs Credit (DO Internal)</h3><div class="cv"><canvas id="c4"></canvas></div></div>
+  </div>
+  <h2 id="h1">Ringkasan SPK &amp; DO</h2><div class="tw" id="t1"></div>
+    <h2 id="h3">Harian tanggal 1–15</h2><div class="tw" id="t3"></div>
+  <h2 id="h4">Harian tanggal 16–30</h2><div class="tw" id="t4"></div>
+  <h2 id="h5">Rekapitulasi Jenis Penjualan · By SPK (data SPK)</h2><div class="tw" id="t5"></div>
+  <h2 id="h6">Rekapitulasi Jenis Penjualan · By DO (data DO Internal)</h2><div class="tw" id="t6"></div>
+</div>
+<div id="pgProg" hidden>
+  <header><div><h1>SPK DO &amp; Progress</h1><div class="date">Data langsung dari Google Sheet</div></div></header>
+  <div class="note">SPK dihitung dari sheet SPK (tanggal SPK) dan DO dari sheet DO Internal (tanggal DO), per supervisor. Avg target = target ÷ 28.</div>
+  <div class="tw" id="prog"></div>
+</div>
+<div id="pgM" hidden>
+  <header><div><h1>MSCP</h1><div class="date" id="dm"></div></div></header>
+  <div class="chips" id="mchips"><button class="chip on" data-t="S">MSCP by SPK</button><button class="chip" data-t="D">MSCP by DO</button></div>
+  <div class="note">MSCP by SPK dihitung dari sheet SPK (kolom LEASING), MSCP by DO dari sheet DO Internal (kolom NAMA LEASING). MSCP = unit TAF+ACC+Maybank+MTF+IMFI+BAF ÷ total. Hijau jika ≥ 90%.</div>
+  <div class="tw" id="ms"></div>
+</div>
+<div id="pgZ" hidden>
+  <header><div><h1>Zona Clinic</h1><div class="date" id="dz"></div></div></header>
+  <div class="note" id="zk"></div>
+  <div class="tw" id="zn"></div>
+</div>
+<div id="pgS" hidden>
+  <header><div><h1>Penjualan</h1><div class="date" id="ds"></div></div></header>
+  <div class="kpis" id="sk"></div>
+  <div class="grid"><div class="card"><h3>10 Tipe Unit Terlaris (SPK vs DO)</h3><div class="cv"><canvas id="s1"></canvas></div></div><div class="card"><h3>Kontribusi SPK per Cabang</h3><div class="cv"><canvas id="s2"></canvas></div></div></div>
+  <h2>Rekapitulasi SPKS dan DO Internal</h2><div class="tw" id="sl"></div>
+  <div id="sl2"></div><div id="sl3"></div>
+  <div class="note" style="margin-top:12px">Productivity Sales = DO Internal ÷ jumlah sales (field sales + counter) yang tercatat di sheet SPK dan DO Internal. Rata-rata harian = total ÷ tanggal hari ini.</div>
+</div>
+<div id="pgR" hidden>
+  <header><div><h1>Rate</h1><div class="date" id="dr"></div></div></header>
+  <div class="note">Jumlah unit per supervisor untuk 4 model utama. Merah dengan tanda ⚠ = belum ada (0), hijau = sudah ada (1 atau lebih).</div>
+  <h2>By SPK (data SPK)</h2><div id="r4a"></div>
+  <h2>By DO (data DO Internal)</h2><div id="r4b"></div>
+</div>
+<div id="pgC" hidden>
+  <header class="noprint"><div><h1>Cetak Report</h1><div class="date" id="dc"></div></div></header>
+  <div class="card">
+    <div class="ptitle">REPORT TAG · LAPORAN SPK &amp; DO PER SUPERVISOR</div><div class="pdate" id="cpr"></div>
+    <div class="frm">
+      <label for="cp1">Periode</label><div class="rng"><input type="date" id="cp1"><span>s.d</span><input type="date" id="cp2"></div>
+      <label for="cs">Nama Supervisor</label><select id="cs"></select>
+      <label>Nama Cabang</label><div class="fv" id="cc"></div>
+      <label>Nama Kacab</label><div class="fv" id="ck"></div>
+      <label>Total DO</label><div class="fv" id="ctd"></div>
+      <label>Total SPK</label><div class="fv" id="cts"></div>
+    </div>
+    <div class="grid cgr">
+      <div class="card"><h3>Perbandingan SPK 2025 vs 2026</h3><div class="cv"><canvas id="cch1"></canvas></div></div>
+      <div class="card"><h3>Perbandingan DO 2025 vs 2026</h3><div class="cv"><canvas id="cch2"></canvas></div></div>
+    </div>
+    <div class="r2" id="ctb"></div>
+    <div class="noprint pbar"><button type="button" class="tog pbt" id="xbtn">Export PDF</button></div>
+  </div>
+</div>
+</main>
+<script src="index.js"></script>
+</body>
+</html>
